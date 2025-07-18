@@ -35,12 +35,7 @@ async def on_error(context: TurnContext, error: Exception):
     # Send a message to the user
     await context.send_activity("The agent encountered an error or bug.")
 
-@bot_app.feedback_loop()
-async def feedback_loop(_context: TurnContext, _state: TurnState, feedback_loop_data: FeedbackLoopData):
-    # Add custom feedback process logic here.
-    print(f"Your feedback is:\n{json.dumps(asdict(feedback_loop_data), indent=4)}")
-
-@bot_app.message("")
+@bot_app.activity("message")
 async def on_hi_message(context: TurnContext, state: TurnState):
     print("hello!")
     await context.send_activity("Hello!")
