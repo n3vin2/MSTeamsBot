@@ -16,14 +16,6 @@ from botbuilder.schema.teams import FileConsentCard, FileConsentCardResponse, Fi
 from botbuilder.schema.teams.additional_properties import ContentType
 from botframework.connector.aio import ConnectorClient
 
-from teams import Application, ApplicationOptions, TeamsAdapter
-from teams.ai import AIOptions
-from teams.ai.models import AzureOpenAIModelOptions, OpenAIModel, OpenAIModelOptions
-from teams.ai.planners import ActionPlanner, ActionPlannerOptions
-from teams.ai.prompts import PromptManager, PromptManagerOptions
-from teams.state import TurnState
-from teams.feedback_loop_data import FeedbackLoopData
-
 import xml.etree.ElementTree as ET
 import lxml.html
 
@@ -49,13 +41,14 @@ from botbuilder.schema import (
     ConversationAccount
 )
 from botbuilder.core.teams import TeamsActivityHandler
-from botbuilder.schema.teams.additional_properties import ContentType
 
 import requests
 import glob
 from datetime import datetime, timezone
 
 import html
+
+import asyncio
 
 sma_token = os.environ.get("sma_token")
 sma_server = os.environ.get("sma_server")
@@ -102,7 +95,7 @@ def greetings():
         "If you have any questions, please contact Hao.Ban@eHealthsask.ca"
 
 def help_me():
-    return "Sure! I can help. Below are the commands that I understand:\n" \
+    """ return "Sure! I can help. Below are the commands that I understand:\n" \
         "\n" \
         "`Hello` - I will display my greeting message.\n" \
         "\n" \
@@ -119,8 +112,22 @@ def help_me():
         "`Block IOCs` \n" \
         "\n" \
         "If you need to report an email security incident, please forward the suspicious email as an attachement to emailsecurity@ehealthsask.ca"
+    """
+    return "Sure! I can help. Below are the commands that I understand:\n" \
+    "\n" \
+    "`Hello` - I will display my greeting message.\n" \
+    "\n" \
+    "`Help` - I will display what I can do.\n" \
+    "\n" \
+    "`Client Certificates` \n" \
+    "\n" \
+    "`Script Status` \n" \
+    "\n" \
+    "`Block IOCs` \n" \
+    "\n" \
+    "If you need to report an email security incident, please forward the suspicious email as an attachement to emailsecurity@ehealthsask.ca"
 
-def create_release_emails_card():
+""" def create_release_emails_card():
     ADAPTIVE_CARD_CONTENT = {
         "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
         "type": "AdaptiveCard",
@@ -201,9 +208,9 @@ def create_release_emails_card():
             }
         ]
     }
-    return CardFactory.adaptive_card(ADAPTIVE_CARD_CONTENT)
+    return CardFactory.adaptive_card(ADAPTIVE_CARD_CONTENT) """
 
-def create_qualys_assets_card():
+""" def create_qualys_assets_card():
     ADAPTIVE_CARD_CONTENT = {
         "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
         "type": "AdaptiveCard",
@@ -235,7 +242,7 @@ def create_qualys_assets_card():
             }
         ]
     }
-    return CardFactory.adaptive_card(ADAPTIVE_CARD_CONTENT)
+    return CardFactory.adaptive_card(ADAPTIVE_CARD_CONTENT) """
 
 def create_single_or_batch_card():
     ADAPTIVE_CARD_CONTENT = {
@@ -256,6 +263,7 @@ def create_single_or_batch_card():
             },
             {
                 "type": "Input.ChoiceSet",
+                "isRequired": True,
                 "id": "Batch",
                 "value": "False",
                 "choices": [
@@ -362,6 +370,7 @@ def create_client_certificates_card():
             {
                 "type": "Input.ChoiceSet",
                 "id": "CertificateType",
+                "isRequired": True,
                 "choices": [
                     {
                         "title": "SLRR Certificate",
@@ -380,6 +389,7 @@ def create_client_certificates_card():
             {
                 "type": "Input.ChoiceSet",
                 "id": "Environment",
+                "isRequired": True,
                 "choices": [
                     {
                         "title": "PROD",
@@ -422,6 +432,7 @@ def create_client_certificates_card():
             {
                 "type": "Input.ChoiceSet",
                 "id": "S",
+                "isRequired": True,
                 "choices": [
                     {
                         "title": "Alberta",
@@ -634,7 +645,7 @@ def create_block_iocs_card():
 
     return CardFactory.adaptive_card(ADAPTIVE_CARD_CONTENT)
 
-async def releaseemails(turn_context: TurnContext, PersonName: str, PersonEmail: str):
+""" async def releaseemails(turn_context: TurnContext, PersonName: str, PersonEmail: str):
     submitted_data = turn_context.activity.value
     
     if submitted_data['Question1'] == 'YES' and submitted_data['Question2'] == 'YES' and submitted_data['Question3'] == 'YES':
@@ -701,17 +712,17 @@ async def releaseemails(turn_context: TurnContext, PersonName: str, PersonEmail:
     else:
         msg = "You answered \"NO\" to any of the questions above, please delete the email or mark it as \"Junk\" in your mail client."
         print(msg)
-    await turn_context.send_activity(msg)
+    await turn_context.send_activity(msg) """
     
-async def queryassets(turn_context: TurnContext):
+""" async def queryassets(turn_context: TurnContext):
     submitted_data = turn_context.activity.value
     HOSTNAME = submitted_data.get("HOSTNAME")
-    xml = """<ServiceRequest>
+    xml = \"""<ServiceRequest>
         <filters>
         <Criteria field="tagName" operator="EQUALS">{TAGNAME}</Criteria>
         <Criteria field="name" operator="CONTAINS">{HOSTNAME}</Criteria>
         </filters>
-        </ServiceRequest>""".format(HOSTNAME=HOSTNAME, TAGNAME="Cloud Agent")
+        </ServiceRequest>\""".format(HOSTNAME=HOSTNAME, TAGNAME="Cloud Agent")
     headers = {'Content-Type': 'text/xml'}
     response = requests.post('https://qualysapi.qg1.apps.qualys.ca/qps/rest/2.0/search/am/hostasset', data=xml, headers=headers, auth=(Qualys_username, Qualys_password))
     root = ET.fromstring(response.text)
@@ -760,12 +771,12 @@ async def queryassets(turn_context: TurnContext):
                 await turn_context.send_activity(msg)
     if status == 'SUCCESS' and count == '0':
         HOSTNAME = HOSTNAME.lower()
-        xml = """<ServiceRequest>
+        xml = \"""<ServiceRequest>
             <filters>
             <Criteria field="tagName" operator="EQUALS">{TAGNAME}</Criteria>
             <Criteria field="name" operator="CONTAINS">{HOSTNAME}</Criteria>
             </filters>
-            </ServiceRequest>""".format(HOSTNAME=HOSTNAME, TAGNAME="Cloud Agent")
+            </ServiceRequest>\""".format(HOSTNAME=HOSTNAME, TAGNAME="Cloud Agent")
         headers = {'Content-Type': 'text/xml'}
         response = requests.post('https://qualysapi.qg1.apps.qualys.ca/qps/rest/2.0/search/am/hostasset', data=xml, headers=headers, auth=(Qualys_username, Qualys_password))
         root = ET.fromstring(response.text)
@@ -795,12 +806,12 @@ async def queryassets(turn_context: TurnContext):
                 # MyBot.vuln_list(HostID,AssetID,HOSTNAME)
     if status == 'SUCCESS' and count == '0':
         HOSTNAME = HOSTNAME.lower()
-        xml = """<ServiceRequest>
+        xml = \"""<ServiceRequest>
             <filters>
             <Criteria field="tagName" operator="EQUALS">{TAGNAME}</Criteria>
             <Criteria field="name" operator="CONTAINS">{HOSTNAME}</Criteria>
             </filters>
-            </ServiceRequest>""".format(HOSTNAME=HOSTNAME, TAGNAME="Cloud Agent")
+            </ServiceRequest>\""".format(HOSTNAME=HOSTNAME, TAGNAME="Cloud Agent")
         headers = {'Content-Type': 'text/xml'}
         response = requests.post('https://qualysapi.qg1.apps.qualys.ca/qps/rest/2.0/search/am/hostasset', data=xml, headers=headers, auth=(Qualys_username, Qualys_password))
         root = ET.fromstring(response.text)
@@ -814,7 +825,7 @@ async def queryassets(turn_context: TurnContext):
                 FQDN = root[3][0].findall('fqdn')[0].text
             except IndexError:
                 FQDN = root[3][0].findall('name')[0].text
-            """ RoomID = webhook['data']['roomId'] """
+            \""" RoomID = webhook['data']['roomId'] \"""
             await turn_context.send_activity(msg)
             #send_post("https://webexapis.com/v1/messages/", {"roomId": RoomID, "markdown": msg})
             filename = FQDN + "_" + datetime.now().strftime('%Y-%m-%d')+ ".csv"
@@ -831,10 +842,11 @@ async def queryassets(turn_context: TurnContext):
                 #MyBot.vuln_list(HostID,AssetID,HOSTNAME)            
     if status == 'SUCCESS' and count == '0':
         msg = "Can't find " + HOSTNAME + " in Qualys. Host name is case-sensitive, please confirm the hostname and try again."
-        await turn_context.send_activity(msg)
+        await turn_context.send_activity(msg) """
 
-async def client_certificates(turn_context: TurnContext):
+async def client_certificates(turn_context: TurnContext, PersonEmail: str):
     submitted_data = turn_context.activity.value
+    print(datetime.now().strftime('%Y-%m-%d %H:%M:%S') + " | " + str(PersonEmail) + " | submit \"client certificates\" request.", file=open("Certificate_output.log", "a"))
     CSR_content = """[Version]
         Signature = "$Windows NT$"
         [NewRequest]
@@ -865,7 +877,7 @@ async def client_certificates(turn_context: TurnContext):
         Commentfile.writelines(comments)
     Commentfile.close()
     if os.path.isfile(filename):
-        Generate_Certificate = subprocess.run(['powershell.exe', '-File', './Generate_Certificate.ps1',  filename, environment, comment_file])
+        Generate_Certificate = subprocess.run(['pwsh.exe', '-File', './Generate_Certificate.ps1',  filename, environment, comment_file])
     else:
         await turn_context.send_activity(filename + " doesn't exist")
     if Generate_Certificate.returncode != 0:
@@ -878,7 +890,7 @@ def create_batch_csv(turn_context: TurnContext, personEmail: str, tmpFile):
     has_error = False
     current_datetime = datetime.now()
     filename = f"{personEmail}_{current_datetime.year:04}{current_datetime.month:02}{current_datetime.day:02}_{current_datetime.hour:02}{current_datetime.minute:02}{current_datetime.second:02}"
-    batch_cert_request = subprocess.run(['powershell.exe', './AutoGenerate_Client_CertificateTEST.ps1', tmpFile.name, filename])
+    batch_cert_request = subprocess.run(['powershell.exe', './AutoGenerate_Client_Certificate.ps1', tmpFile.name, filename])
     tmpFile.close()
     os.remove(tmpFile.name)
     has_error = batch_cert_request.returncode == 4444
@@ -907,7 +919,7 @@ def remove_extra_files(zip_name):
     for file in files:
         os.remove(file)
 
-def block_ioc(turn_context: TurnContext, PersonEmail):
+async def block_ioc(turn_context: TurnContext, PersonEmail):
     submitted_data = turn_context.activity.value
     comment = submitted_data.get('comment')
     if not comment:
@@ -920,7 +932,8 @@ def block_ioc(turn_context: TurnContext, PersonEmail):
         process = subprocess.run(['powershell.exe', './MineMeld_Indicator.ps1', submitted_data.get('value'), submitted_data.get('type'), str(expiry), "-comment", f"'{comment}'", "-UUID", submitted_data.get('UUID')])
     else:
         process = subprocess.run(['powershell.exe', './MineMeld_Indicator.ps1', submitted_data.get('value'), submitted_data.get('type'), str(expiry), "-comment", f"'{comment}'"])
-    return "Successfully added IOC onto Minemeld"
+        #process = subprocess.run(['pwsh.exe', 'test.ps1'])
+    await turn_context.send_activity("Successfully added IOC onto Minemeld")
 
 
 class BotApp(TeamsActivityHandler):
@@ -943,7 +956,7 @@ class BotApp(TeamsActivityHandler):
             and len(turn_context.activity.attachments) >= 2
         ):
             if len(turn_context.activity.attachments) > 2:
-                turn_context.send_activity("Sorry, but I can only accept one attachment at a time.")
+                await turn_context.send_activity("Sorry, but I can only accept one attachment at a time.")
             else:
                 await self.handle_incoming_attachment(turn_context, PersonEmail)
         elif turn_context.activity.text:
@@ -962,24 +975,28 @@ class BotApp(TeamsActivityHandler):
                 message = greetings()
             elif turn_context.activity.text.casefold().startswith('help'.casefold()):
                 message = help_me()
-            elif turn_context.activity.text.casefold().startswith('release emails'.casefold()):
+                """ elif turn_context.activity.text.casefold().startswith('release emails'.casefold()):
                 card = create_release_emails_card()
-            #statement if user inputs qualys assets produces the card after checking access list
-            elif turn_context.activity.text.casefold().startswith('qualys assets'.casefold()):
+            #statement if user inputs qualys assets produces the card after checking access list """
+                """ elif turn_context.activity.text.casefold().startswith('qualys assets'.casefold()):
                 if accesslist_ADMIN == "ALL" or PersonEmail.lower() in accesslist_ADMIN or PersonEmail.lower() in accesslist_QUALYS:
                     card = create_qualys_assets_card()
                 else:
-                    message = "Sorry, you (" + PersonName + ") are NOT allowed to use this module. Please contact Hao.Ban@eHealthsask.ca for help."
+                    message = "Sorry, you (" + PersonName + ") are NOT allowed to use this module. Please contact Hao.Ban@eHealthsask.ca for help." """
             #statement if user inputs client certficates produces the card after checking access list
             elif turn_context.activity.text.casefold().startswith('client certificates'.casefold()):
                 if accesslist_ADMIN == "ALL" or PersonEmail.lower() in accesslist_ADMIN or PersonEmail.lower() in accesslist_CERTIFICATES:
-                    card = create_single_or_batch_card()
+                    if turn_context.activity.conversation.conversation_type == "personal":
+                        card = create_single_or_batch_card()
+                    else:
+                        message = "I'm sorry, but I can only perform this feature in a personal chat"
                 else:
                     message = "Sorry, you (" + PersonName + ") are NOT allowed to use this module. Please contact Hao.Ban@eHealthsask.ca for help."
             elif turn_context.activity.text.casefold().startswith('script status'.casefold()):
                 if accesslist_ADMIN == "ALL" or PersonEmail.lower() in accesslist_ADMIN or PersonEmail.lower() in accesslist_SCRIPTSTATUS:
-                    Processor_Monitor = subprocess.run(['powershell.exe', '-File', './ProcessorMonitor.ps1'], capture_output=True, text=True)
-                    message = Processor_Monitor.stdout
+                    Processor_Monitor = subprocess.run(['pwsh.exe', '-File', './ProcessorMonitor.ps1', 'teams'])
+                    with open("MSG_teams.txt", "r") as message_file:
+                        message = message_file.read()
                 else:
                     message = "Sorry, you (" + PersonName + ") are NOT allowed to use this module. Please contact Hao.Ban@eHealthsask.ca for help."
             elif turn_context.activity.text.casefold().startswith('block iocs'.casefold()):
@@ -995,17 +1012,18 @@ class BotApp(TeamsActivityHandler):
                 reply.attachments = [card]
             await turn_context.send_activity(reply)
         else:
+            #await turn_context.send_activity(Activity(type=ActivityTypes.invoke_response))
             submitted_data = turn_context.activity.value
-            if submitted_data and submitted_data.get("id") == "ReleaseEmails":
-                await releaseemails(turn_context, PersonName, PersonEmail)
-            elif submitted_data and submitted_data.get("id") == "SingleOrBatch":
+            """ if submitted_data and submitted_data.get("id") == "ReleaseEmails":
+                await releaseemails(turn_context, PersonName, PersonEmail) """
+            if submitted_data and submitted_data.get("id") == "SingleOrBatch":
                 old_message_id = turn_context.activity.channel_data["legacy"]["replyToId"]
                 if submitted_data.get("Batch") == "True":
                     batch_certificate_cards = create_batch_certificates_card()
                     new_message = MessageFactory.attachment(batch_certificate_cards[0])
                     new_message.id = old_message_id
                     await turn_context.update_activity(new_message)
-                    await self.send_csv_request(turn_context, "Client_Certificate_Information_Template.csv", "Please fill out this CSV", "templateCSVRequest")
+                    await self.send_file_request(turn_context, "Client_Certificate_Information_Template.csv", "Please fill out this CSV", "templateCSVRequest")
                     await turn_context.send_activity(MessageFactory.attachment(batch_certificate_cards[1]))
                     uploadAttachmentMessage = "<span style=\"background-color:#AA0000; color:whitesmoke; font-size:4rem;\">Please reply to <strong>this message</strong> when uploading the CSV file</span>"
                     await turn_context.send_activity(MessageFactory.text(uploadAttachmentMessage))
@@ -1014,14 +1032,17 @@ class BotApp(TeamsActivityHandler):
                     new_message.id = old_message_id
                     await turn_context.update_activity(new_message)
             elif submitted_data and submitted_data.get("id") == "ClientCertificates":
-                await client_certificates(turn_context)
-            elif submitted_data and submitted_data.get("id") == "QualysAssets":
-                await queryassets(turn_context)
+                loop = asyncio.get_event_loop()
+                loop.create_task(client_certificates(turn_context, PersonEmail))
+                """ elif submitted_data and submitted_data.get("id") == "QualysAssets":
+                await queryassets(turn_context) """
             elif submitted_data and submitted_data.get("id") == "BlockIOCs":
-                block_ioc(turn_context, PersonEmail)
+                loop = asyncio.get_event_loop()
+                loop.create_task(block_ioc(turn_context, PersonEmail))
+                #await block_ioc(turn_context, PersonEmail)
         return True
     
-    async def send_csv_request(self, turn_context: TurnContext, filename: str, file_card_desc: str, file_purpose: str):
+    async def send_file_request(self, turn_context: TurnContext, filename: str, file_card_desc: str, file_purpose: str):
         """Send a FileConsentCard to get user consent to upload a file."""
         file_path = filename
         file_size = os.path.getsize(file_path)
@@ -1137,7 +1158,8 @@ class BotApp(TeamsActivityHandler):
                 attachmentToDownload = attachment
 
         if repliedToAttachmentCard and attachmentIsCsv:
-            await self.process_csv(turn_context, attachmentToDownload, personEmail)
+            loop = asyncio.get_event_loop()
+            loop.create_task(self.process_csv(turn_context, attachmentToDownload, personEmail))
         else:
             message = "I'm sorry, I don't understand that. Please try again or type \"help\" to see my command list."
 
@@ -1161,10 +1183,10 @@ class BotApp(TeamsActivityHandler):
                 t.write(response.content)
             has_error, zip_name = create_batch_csv(turn_context, personEmail, tmp)
             if has_error:
-                turn_context.send_activity(MessageFactory.attachment(create_batch_certificate_error_card()))
+                await turn_context.send_activity(MessageFactory.attachment(create_batch_certificate_error_card()))
 
-            await self.send_csv_request(turn_context, zip_name, "Here are your results", "batchCSVResults")
+            await self.send_file_request(turn_context, zip_name, "Here are your results", "batchCSVResults")
             remove_extra_files(zip_name)
 
         else:
-            turn_context.send_activity(MessageFactory.attachment(create_batch_certificate_error_card()))
+            await turn_context.send_activity(MessageFactory.attachment(create_batch_certificate_error_card()))
