@@ -12,7 +12,7 @@ load_dotenv()
 class Config:
     """Bot Configuration"""
 
-    PORT = 5000
+    PORT = 6000
     APP_TYPE = os.environ.get("BOT_TYPE", "")
     APP_ID = os.environ.get("BOT_ID", "")
     APP_PASSWORD = os.environ.get("BOT_PASSWORD", "")
