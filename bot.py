@@ -932,7 +932,6 @@ async def block_ioc(turn_context: TurnContext, PersonEmail):
         process = subprocess.run(['powershell.exe', './MineMeld_Indicator.ps1', submitted_data.get('value'), submitted_data.get('type'), str(expiry), "-comment", f"'{comment}'", "-UUID", submitted_data.get('UUID')])
     else:
         process = subprocess.run(['powershell.exe', './MineMeld_Indicator.ps1', submitted_data.get('value'), submitted_data.get('type'), str(expiry), "-comment", f"'{comment}'"])
-        #process = subprocess.run(['pwsh.exe', 'test.ps1'])
     await turn_context.send_activity("Successfully added IOC onto Minemeld")
 
 
@@ -1012,7 +1011,6 @@ class BotApp(TeamsActivityHandler):
                 reply.attachments = [card]
             await turn_context.send_activity(reply)
         else:
-            #await turn_context.send_activity(Activity(type=ActivityTypes.invoke_response))
             submitted_data = turn_context.activity.value
             """ if submitted_data and submitted_data.get("id") == "ReleaseEmails":
                 await releaseemails(turn_context, PersonName, PersonEmail) """
@@ -1039,7 +1037,6 @@ class BotApp(TeamsActivityHandler):
             elif submitted_data and submitted_data.get("id") == "BlockIOCs":
                 loop = asyncio.get_event_loop()
                 loop.create_task(block_ioc(turn_context, PersonEmail))
-                #await block_ioc(turn_context, PersonEmail)
         return True
     
     async def send_file_request(self, turn_context: TurnContext, filename: str, file_card_desc: str, file_purpose: str):
