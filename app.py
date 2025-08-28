@@ -31,9 +31,14 @@ load_dotenv()
 ngrok_domain = os.environ.get("NGROK_DOMAIN")
 NGROK_AUTH_TOKEN_TEAMS = os.environ.get("NGROK_AUTH_TOKEN_TEAMS")
 
+conf.get_default().region = "us"
+
 ngrok.set_auth_token(NGROK_AUTH_TOKEN_TEAMS)
 ngrok.connect(6000, domain=ngrok_domain).public_url  #Start ngrok on port 6000
 ngrok_response = requests.get('http://127.0.0.1:4040/api/tunnels')
+
+script_path = os.path.dirname(os.path.abspath(__file__))
+os.chdir(script_path)
 
 ADAPTER = CloudAdapter(ConfigurationBotFrameworkAuthentication(CONFIG))
 

@@ -64,7 +64,6 @@ if os.path.exists('accesslist.xml') :
     accesslist_QUALYS = []
     accesslist_RELEASEEMAIL = []
     accesslist_SCRIPTSTATUS = []
-    accesslist_REQUESTEDQUARANTINE = []
     if len(root.findall("ADMIN")[0]) != 0:
         for i in range(len(root.findall("ADMIN")[0])):
             accesslist_ADMIN.append(root.findall("ADMIN")[0][i-1].text.lower())
@@ -79,10 +78,7 @@ if os.path.exists('accesslist.xml') :
             accesslist_RELEASEEMAIL.append(root.findall("RELEASEEMAIL")[0][i-1].text.lower())
     if len(root.findall("SCRIPTSTATUS")[0]) != 0:
         for i in range(len(root.findall("SCRIPTSTATUS")[0])):
-            accesslist_SCRIPTSTATUS.append(root.findall("SCRIPTSTATUS")[0][i-1].text.lower())
-    if len(root.findall("REQUESTEDQUARANTINE")[0]) != 0:
-        for i in range(len(root.findall("REQUESTEDQUARANTINE")[0])):
-            accesslist_REQUESTEDQUARANTINE.append(root.findall("REQUESTEDQUARANTINE")[0][i-1].text.lower())     
+            accesslist_SCRIPTSTATUS.append(root.findall("SCRIPTSTATUS")[0][i-1].text.lower()) 
 else:
     accesslist_ADMIN = "ALL"
 
@@ -95,24 +91,6 @@ def greetings():
         "If you have any questions, please contact Hao.Ban@eHealthsask.ca"
 
 def help_me():
-    """ return "Sure! I can help. Below are the commands that I understand:\n" \
-        "\n" \
-        "`Hello` - I will display my greeting message.\n" \
-        "\n" \
-        "`Help` - I will display what I can do.\n" \
-        "\n" \
-        "`Release Emails` \n" \
-        "\n" \
-        "`Qualys Assets` \n" \
-        "\n" \
-        "`Client Certificates` \n" \
-        "\n" \
-        "`Script Status` \n" \
-        "\n" \
-        "`Block IOCs` \n" \
-        "\n" \
-        "If you need to report an email security incident, please forward the suspicious email as an attachement to emailsecurity@ehealthsask.ca"
-    """
     return "Sure! I can help. Below are the commands that I understand:\n" \
     "\n" \
     "`Hello` - I will display my greeting message.\n" \
@@ -126,123 +104,6 @@ def help_me():
     "`Block IOCs` \n" \
     "\n" \
     "If you need to report an email security incident, please forward the suspicious email as an attachement to emailsecurity@ehealthsask.ca"
-
-""" def create_release_emails_card():
-    ADAPTIVE_CARD_CONTENT = {
-        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-        "type": "AdaptiveCard",
-        "version": "1.2",
-        "body": [
-            {
-                "type": "TextBlock",
-                "size": "Large",
-                "weight": "Bolder",
-                "text": "Release Encrypted Emails",
-                "horizontalAlignment": "Center"
-            },
-            {
-                "type": "TextBlock",
-                "text": "Before proceeding:",
-                "size": "Medium",
-                "weight": "Bolder"
-            },
-            {
-                "type": "Input.Toggle",
-                "title": "Do you know the sender? (Select-YES/Empty-NO)",
-                "valueOn": "YES",
-                "valueOff": "NO",
-                "id": "Question1"
-            },
-            {
-                "type": "Input.Toggle",
-                "title": "Are you expecting this message? (Select-YES/Empty-NO)",
-                "valueOn": "YES",
-                "valueOff": "NO",
-                "id": "Question2"
-            },
-            {
-                "type": "Input.Toggle",
-                "title": "Is this business-related? (Select-YES/Empty-NO)",
-                "valueOn": "YES",
-                "valueOff": "NO",
-                "id": "Question3"
-            },
-            {
-                "type": "Input.ChoiceSet",
-                "id": "Environment",
-                "value": "ESA",
-                "choices": [
-                    {
-                        "title": "Microsoft O365",
-                        "value": "O365"
-                    },
-                    {
-                        "title": "Cisco ESA",
-                        "value": "ESA"
-                    }
-                ]
-            },
-            {
-                "type": "Input.Text",
-                "placeholder": "Message ID",
-                "style": "text",
-                "maxLength": 0,
-                "id": "MID"
-            },
-            {
-                "type": "Input.Text",
-                "placeholder": "Recipient (Use COMMA to seperate Multi Email Address)",
-                "style": "text",
-                "maxLength": 0,
-                "id": "RECIPIENT"
-            }
-        ],
-        "actions": [
-            {
-                "type": "Action.Submit",
-                "title": "Submit",
-                "data": {
-                    "cardType": "input",
-                    "id": "ReleaseEmails"
-                }
-            }
-        ]
-    }
-    return CardFactory.adaptive_card(ADAPTIVE_CARD_CONTENT) """
-
-""" def create_qualys_assets_card():
-    ADAPTIVE_CARD_CONTENT = {
-        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
-        "type": "AdaptiveCard",
-        "version": "1.5",
-        "body": [
-            {
-                "type": "TextBlock",
-                "size": "medium",
-                "weight": "bolder",
-                "text": "Query Qualys Assets",
-                "horizontalAlignment": "center"
-            },
-            {
-                "type": "Input.Text",
-                "placeholder": "HOSTNAME",
-                "style": "text",
-                "maxLength": 0,
-                "id": "HOSTNAME"
-            }
-        ],
-        "actions": [
-            {
-                "type": "Action.Submit",
-                "title": "Submit",
-                "data": {
-                    "cardType": "input",
-                    "id": "QualysAssets"
-                }
-            }
-        ]
-    }
-    return CardFactory.adaptive_card(ADAPTIVE_CARD_CONTENT) """
 
 def create_single_or_batch_card():
     ADAPTIVE_CARD_CONTENT = {
@@ -320,7 +181,7 @@ def create_batch_certificates_card():
             {
                 "type": "TextBlock",
                 "wrap": True,
-                "text": "Once you have finished filling out the entries in the CSV file, please REPLY to this message and upload the file TO THIS THREAD"
+                "text": "Once you have finished filling out the entries in the CSV file, please REPLY to THE MESSAGE BELOW and upload the file"
             },
             {
                 "type": "TextBlock",
@@ -489,11 +350,18 @@ def create_client_certificates_card():
                 ]
             },
             {
-                "type": "Input.Text",
-                "placeholder": "Country",
-                "style": "text",
-                "maxLength": 0,
-                "value": "CA",
+                "type": "Input.ChoiceSet",
+                "isRequired": True,
+                "choices": [
+                    {
+                        "title": "CA",
+                        "value": "CA"
+                    },
+                    {
+                        "title": "US",
+                        "value": "US"
+                    }
+                ],
                 "id": "C"
             },
             {
@@ -535,6 +403,23 @@ def create_batch_certificate_error_card():
                 "wrap": True,
                 "color": "attention",
                 "text": f"ERROR: There was an error processing one or more of your certificate requests. Please try again for these entries."
+            }
+        ]
+    }
+
+    return CardFactory.adaptive_card(ADAPTIVE_CARD_CONTENT)
+
+def create_batch_certificate_members_missing_card():
+    ADAPTIVE_CARD_CONTENT = {
+        "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
+        "type": "AdaptiveCard",
+        "version": "1.2",
+        "body": [
+            {
+                "type": "TextBlock",
+                "wrap": True,
+                "color": "attention",
+                "text": f"The CSV you submitted is missing one or more members. Please try again with all members added."
             }
         ]
     }
@@ -645,205 +530,6 @@ def create_block_iocs_card():
 
     return CardFactory.adaptive_card(ADAPTIVE_CARD_CONTENT)
 
-""" async def releaseemails(turn_context: TurnContext, PersonName: str, PersonEmail: str):
-    submitted_data = turn_context.activity.value
-    
-    if submitted_data['Question1'] == 'YES' and submitted_data['Question2'] == 'YES' and submitted_data['Question3'] == 'YES':
-        if submitted_data['Environment'] == 'ESA':
-            MID = submitted_data['MID']
-            #Created = result['created']
-            Created = turn_context.activity.timestamp
-            #PersonId = result['personId']
-            #PersonName = send_get('https://webexapis.com/v1/people/{0}'.format(PersonId))['displayName']
-            #PersonEmail = send_get('https://webexapis.com/v1/people/{0}'.format(PersonId))['emails']
-            with open("ReleaseEmail.log", "r") as file:
-                for line in file:
-                    if MID in line and "successfully" in line:
-                        msg = "Email was already released by: "+line
-                        released = True
-                        break
-                    else:
-                        released = False
-            if not released:
-                COMMAND = "grep "+MID+" mail_logs"
-                ssh = paramiko.SSHClient()
-                ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                k = paramiko.RSAKey.from_private_key_file(os.path.expanduser('.\\.ssh\\id_rsa_esa'))
-                ssh.connect(sma_server, username=sma_uname, pkey=k)
-                ssh_stdin, ssh_stdout, ssh_stderr = ssh.exec_command(COMMAND)
-                for line in ssh_stdout:
-                    try:
-                        found = re.search('MID .* \(', line.strip())
-                        S_MID = found.group(0).split(" ")[1]
-                    except AttributeError:
-                        found = ''
-                ssh.close()
-                if not found:
-                    msg = "Can't find Message MID#" + MID + " in Encrypted Message quarantine. Please check your input and try again."
-                else:
-                    SMA_MID = []
-                    SMA_MID.append(int(S_MID))
-                    SMA_headers = {"Content-Type": "text/plain","Authorization": 'Basic ' + sma_token}
-                    SMA_body = {"action": "release","mids": SMA_MID,"quarantineName": "Encrypted Message","quarantineType": "pvo"}
-                    print(SMA_headers)
-                    print(SMA_body)
-                    SMA_response = requests.post(sma_server_api, data=json.dumps(SMA_body), headers=SMA_headers, verify=False)
-                    print(SMA_response.json())
-                    if SMA_response.status_code == 200 and SMA_response.json()['data']['totalCount'] == 1:
-                        msg = "MID#"+MID+" is released successfully, please check your mailbox."
-                        print(msg)
-                        print(PersonName, PersonEmail, "submitted MID#", MID, "at", Created, "and is released successfully.", file=open("ReleaseEmail.log", "a"))
-                    if SMA_response.status_code == 200 and SMA_response.json()['data']['totalCount'] == 0:
-                        msg = "MID#"+MID+" was already released by the others but wasn't from this bot service."
-                        print(msg)    
-        if submitted_data['Environment'] == 'O365':
-            MID = submitted_data['MID']
-            RECIPIENT = submitted_data['RECIPIENT']
-            #PersonId = result['personId']
-            #PersonEmail = send_get('https://webexapis.com/v1/people/{0}'.format(PersonId))['emails']
-            #RECIPIENT = PersonEmail[0].lower()
-            Release_Email = subprocess.Popen(['powershell.exe', './Release_O365.ps1', MID, RECIPIENT], stdout=subprocess.PIPE)
-            print(Release_Email.pid)
-            Release_Email.wait()
-            if Release_Email.returncode == 0:
-                msg = Release_Email.stdout.read().decode("utf-8")
-            else:
-                msg = "Invalid result: " + str(Release_Email.returncode) + " Please contact the developer to get more detail."
-    else:
-        msg = "You answered \"NO\" to any of the questions above, please delete the email or mark it as \"Junk\" in your mail client."
-        print(msg)
-    await turn_context.send_activity(msg) """
-    
-""" async def queryassets(turn_context: TurnContext):
-    submitted_data = turn_context.activity.value
-    HOSTNAME = submitted_data.get("HOSTNAME")
-    xml = \"""<ServiceRequest>
-        <filters>
-        <Criteria field="tagName" operator="EQUALS">{TAGNAME}</Criteria>
-        <Criteria field="name" operator="CONTAINS">{HOSTNAME}</Criteria>
-        </filters>
-        </ServiceRequest>\""".format(HOSTNAME=HOSTNAME, TAGNAME="Cloud Agent")
-    headers = {'Content-Type': 'text/xml'}
-    response = requests.post('https://qualysapi.qg1.apps.qualys.ca/qps/rest/2.0/search/am/hostasset', data=xml, headers=headers, auth=(Qualys_username, Qualys_password))
-    root = ET.fromstring(response.text)
-    status = root[0].text
-    count = root[1].text
-    if status == 'SUCCESS' and count != '0':
-        try:
-            hostname = root[3][0].findall('name')[0].text
-        except IndexError:
-            hostname = "IndexError"
-        try:
-            AssetID = root[3][0].findall('id')[0].text
-        except IndexError:
-            AssetID = "IndexError"
-        try:
-            HostID = root[3][0].findall('qwebHostId')[0].text
-        except IndexError:
-            HostID = "IndexError"
-        try:
-            IPAddress = root[3][0].findall('address')[0].text
-        except IndexError:
-            IPAddress = "IndexError"
-        try:
-            OS = root[3][0].findall('os')[0].text
-        except IndexError:
-            OS = "IndexError"
-        try:
-            FQDN = root[3][0].findall('fqdn')[0].text
-        except IndexError:
-            FQDN = root[3][0].findall('name')[0].text
-        msg = status + " | " + count + " | " + hostname + " | Asset ID:" + AssetID + " | Host ID:" + HostID + " | IP Address:" + IPAddress  + " | OS:"  + OS
-        await turn_context.send_activity(msg)
-        filename = FQDN + "_" + datetime.now().strftime('%Y-%m-%d') + ".csv"
-        path_filename = './vulnerabilities/' + FQDN + "_" + datetime.now().strftime('%Y-%m-%d') + ".csv"
-        if os.path.exists(path_filename):
-            await turn_context.send_activity('Get Vulnerability list is currently disabled')
-            #data = MultipartEncoder({"files": (filename, open(path_filename, 'rb'), 'text/csv')})
-            #await turn_context.send_activity(data)
-        else:
-            if HostID != "IndexError" and AssetID != "IndexError":
-                msg = "Today's vulnerability file for " + HOSTNAME + " does not exist, bot is generating and will push the CSV file to you when it's done."
-                await turn_context.send_activity(msg)
-                #MyBot.vuln_list(HostID,AssetID,HOSTNAME)
-            else:
-                msg = "HostID or AssetID doesn't exist. Please contact the server administrator to have a check"
-                await turn_context.send_activity(msg)
-    if status == 'SUCCESS' and count == '0':
-        HOSTNAME = HOSTNAME.lower()
-        xml = \"""<ServiceRequest>
-            <filters>
-            <Criteria field="tagName" operator="EQUALS">{TAGNAME}</Criteria>
-            <Criteria field="name" operator="CONTAINS">{HOSTNAME}</Criteria>
-            </filters>
-            </ServiceRequest>\""".format(HOSTNAME=HOSTNAME, TAGNAME="Cloud Agent")
-        headers = {'Content-Type': 'text/xml'}
-        response = requests.post('https://qualysapi.qg1.apps.qualys.ca/qps/rest/2.0/search/am/hostasset', data=xml, headers=headers, auth=(Qualys_username, Qualys_password))
-        root = ET.fromstring(response.text)
-        status = root[0].text
-        count = root[1].text
-        if status == 'SUCCESS' and count != '0':
-            msg = status + " | " + count + " | " + root[3][0].findall('name')[0].text + " | Asset ID:" + root[3][0].findall('id')[0].text + " | Host ID:" + root[3][0].findall('qwebHostId')[0].text + " | IP Address:" + root[3][0].findall('address')[0].text  + " | OS:"  + root[3][0].findall('os')[0].text
-            HostID = root[3][0].findall('qwebHostId')[0].text
-            AssetID = root[3][0].findall('id')[0].text
-            try:
-                FQDN = root[3][0].findall('fqdn')[0].text
-            except IndexError:
-                FQDN = root[3][0].findall('name')[0].text
-            await turn_context.send_activity(msg)
-            #send_post("https://webexapis.com/v1/messages/", {"roomId": RoomID, "markdown": msg})
-            filename = FQDN + "_" + datetime.now().strftime('%Y-%m-%d') + ".csv"
-            path_filename = './vulnerabilities/' + FQDN + "_" + datetime.now().strftime('%Y-%m-%d') + ".csv"
-            if os.path.exists(path_filename):
-                await turn_context.send_activity('Get Vulnerability list is currently disabled')
-                #data = MultipartEncoder({'roomId': RoomID, "files": (filename, open(path_filename, 'rb'), 'text/csv')})
-                #request = requests.post('https://webexapis.com/v1/messages', data=data, headers = {"Authorization": "Bearer " + bearer, 'Content-Type': data.content_type})
-            else:
-                msg = "Today's vulnerability file for " + HOSTNAME + " does not exist, bot is generating and will push the CSV file to you when it's done."
-                await turn_context.send_activity(msg)
-                await turn_context.send_activity('Get Vulnerability List is Currently Disabled')
-                #send_post("https://webexapis.com/v1/messages/", {"roomId": RoomID, "markdown": msg})
-                # MyBot.vuln_list(HostID,AssetID,HOSTNAME)
-    if status == 'SUCCESS' and count == '0':
-        HOSTNAME = HOSTNAME.lower()
-        xml = \"""<ServiceRequest>
-            <filters>
-            <Criteria field="tagName" operator="EQUALS">{TAGNAME}</Criteria>
-            <Criteria field="name" operator="CONTAINS">{HOSTNAME}</Criteria>
-            </filters>
-            </ServiceRequest>\""".format(HOSTNAME=HOSTNAME, TAGNAME="Cloud Agent")
-        headers = {'Content-Type': 'text/xml'}
-        response = requests.post('https://qualysapi.qg1.apps.qualys.ca/qps/rest/2.0/search/am/hostasset', data=xml, headers=headers, auth=(Qualys_username, Qualys_password))
-        root = ET.fromstring(response.text)
-        status = root[0].text
-        count = root[1].text
-        if status == 'SUCCESS' and count != '0':
-            msg = status + " | " + count + " | " + root[3][0].findall('name')[0].text + " | Asset ID:" + root[3][0].findall('id')[0].text + " | Host ID:" + root[3][0].findall('qwebHostId')[0].text + " | IP Address:" + root[3][0].findall('address')[0].text  + " | OS:"  + root[3][0].findall('os')[0].text
-            HostID = root[3][0].findall('qwebHostId')[0].text
-            AssetID = root[3][0].findall('id')[0].text
-            try:
-                FQDN = root[3][0].findall('fqdn')[0].text
-            except IndexError:
-                FQDN = root[3][0].findall('name')[0].text
-            \""" RoomID = webhook['data']['roomId'] \"""
-            await turn_context.send_activity(msg)
-            #send_post("https://webexapis.com/v1/messages/", {"roomId": RoomID, "markdown": msg})
-            filename = FQDN + "_" + datetime.now().strftime('%Y-%m-%d')+ ".csv"
-            path_filename = './vulnerabilities/' + FQDN + "_" + datetime.now().strftime('%Y-%m-%d') + ".csv"
-            if os.path.exists(path_filename):
-                await turn_context.send_activity('Get Vulnerability List is Currently Disabled')
-                #data = MultipartEncoder({'roomId': RoomID, "files": (filename, open(path_filename, 'rb'), 'text/csv')})
-                #request = requests.post('https://webexapis.com/v1/messages', data=data, headers = {"Authorization": "Bearer " + bearer, 'Content-Type': data.content_type})
-            else:
-                msg = "Today's vulnerability file for " + HOSTNAME + " does not exist, bot is generating and will push the CSV file to you when it's done."
-                await turn_context.send_activity(msg)
-                await turn_context.send_activity('Get Vulnerability List is Currently Disabled')
-                #send_post("https://webexapis.com/v1/messages/", {"roomId": RoomID, "markdown": msg})
-                #MyBot.vuln_list(HostID,AssetID,HOSTNAME)            
-    if status == 'SUCCESS' and count == '0':
-        msg = "Can't find " + HOSTNAME + " in Qualys. Host name is case-sensitive, please confirm the hostname and try again."
-        await turn_context.send_activity(msg) """
-
 async def client_certificates(turn_context: TurnContext, PersonEmail: str):
     submitted_data = turn_context.activity.value
     print(datetime.now().strftime('%Y-%m-%d %H:%M:%S') + " | " + str(PersonEmail) + " | submit \"client certificates\" request.", file=open("Certificate_output.log", "a"))
@@ -887,13 +573,12 @@ async def client_certificates(turn_context: TurnContext, PersonEmail: str):
         await turn_context.send_activity("Email has been sent to " + Email + " with the PFX file and password.")
 
 def create_batch_csv(turn_context: TurnContext, personEmail: str, tmpFile):
-    has_error = False
     current_datetime = datetime.now()
     filename = f"{personEmail}_{current_datetime.year:04}{current_datetime.month:02}{current_datetime.day:02}_{current_datetime.hour:02}{current_datetime.minute:02}{current_datetime.second:02}"
     batch_cert_request = subprocess.run(['powershell.exe', './AutoGenerate_Client_Certificate.ps1', tmpFile.name, filename])
     tmpFile.close()
     os.remove(tmpFile.name)
-    has_error = batch_cert_request.returncode == 4444
+    error_code = batch_cert_request.returncode
 
     zip_name = filename + ".zip"
     with zipfile.ZipFile(zip_name, "w", zipfile.ZIP_DEFLATED) as zip_file:
@@ -902,7 +587,7 @@ def create_batch_csv(turn_context: TurnContext, personEmail: str, tmpFile):
                 arc_name = root[root.find("\\") + 1:]
                 zip_file.write(os.path.join(root, file), os.path.join(arc_name, file))
 
-    return [has_error, zip_name]
+    return [error_code, zip_name]
 
 def remove_extra_files(zip_name):
     os.remove(zip_name)                                        
@@ -974,21 +659,12 @@ class BotApp(TeamsActivityHandler):
                 message = greetings()
             elif turn_context.activity.text.casefold().startswith('help'.casefold()):
                 message = help_me()
-                """ elif turn_context.activity.text.casefold().startswith('release emails'.casefold()):
-                card = create_release_emails_card()
-            #statement if user inputs qualys assets produces the card after checking access list """
-                """ elif turn_context.activity.text.casefold().startswith('qualys assets'.casefold()):
-                if accesslist_ADMIN == "ALL" or PersonEmail.lower() in accesslist_ADMIN or PersonEmail.lower() in accesslist_QUALYS:
-                    card = create_qualys_assets_card()
-                else:
-                    message = "Sorry, you (" + PersonName + ") are NOT allowed to use this module. Please contact Hao.Ban@eHealthsask.ca for help." """
-            #statement if user inputs client certficates produces the card after checking access list
             elif turn_context.activity.text.casefold().startswith('client certificates'.casefold()):
                 if accesslist_ADMIN == "ALL" or PersonEmail.lower() in accesslist_ADMIN or PersonEmail.lower() in accesslist_CERTIFICATES:
                     if turn_context.activity.conversation.conversation_type == "personal":
                         card = create_single_or_batch_card()
                     else:
-                        message = "I'm sorry, but I can only perform this feature in a personal chat"
+                        message = "I'm sorry, but due to privacy and security compliance requirements, I can only perform this feature in a personal chat."
                 else:
                     message = "Sorry, you (" + PersonName + ") are NOT allowed to use this module. Please contact Hao.Ban@eHealthsask.ca for help."
             elif turn_context.activity.text.casefold().startswith('script status'.casefold()):
@@ -1012,8 +688,6 @@ class BotApp(TeamsActivityHandler):
             await turn_context.send_activity(reply)
         else:
             submitted_data = turn_context.activity.value
-            """ if submitted_data and submitted_data.get("id") == "ReleaseEmails":
-                await releaseemails(turn_context, PersonName, PersonEmail) """
             if submitted_data and submitted_data.get("id") == "SingleOrBatch":
                 old_message_id = turn_context.activity.channel_data["legacy"]["replyToId"]
                 if submitted_data.get("Batch") == "True":
@@ -1032,8 +706,6 @@ class BotApp(TeamsActivityHandler):
             elif submitted_data and submitted_data.get("id") == "ClientCertificates":
                 loop = asyncio.get_event_loop()
                 loop.create_task(client_certificates(turn_context, PersonEmail))
-                """ elif submitted_data and submitted_data.get("id") == "QualysAssets":
-                await queryassets(turn_context) """
             elif submitted_data and submitted_data.get("id") == "BlockIOCs":
                 loop = asyncio.get_event_loop()
                 loop.create_task(block_ioc(turn_context, PersonEmail))
@@ -1139,7 +811,6 @@ class BotApp(TeamsActivityHandler):
         attachmentToDownload = None
         for attachment in turn_context.activity.attachments:
             if attachment.content_type == "text/html":
-                """ print(attachment.content) """
 
                 previousMessage = []
                 previousMessageHTML = lxml.html.fromstring("<div>" + attachment.content + "</div>")
@@ -1178,8 +849,12 @@ class BotApp(TeamsActivityHandler):
             tmp = tempfile.NamedTemporaryFile(suffix = ".csv", dir = ".", delete = False)
             with open(tmp.name, "wb") as t:
                 t.write(response.content)
-            has_error, zip_name = create_batch_csv(turn_context, personEmail, tmp)
-            if has_error:
+            error_code, zip_name = create_batch_csv(turn_context, personEmail, tmp)
+            if error_code == 4443:
+                await turn_context.send_activity(MessageFactory.attachment(create_batch_certificate_members_missing_card()))
+                remove_extra_files(zip_name)
+                return
+            elif error_code == 4444:
                 await turn_context.send_activity(MessageFactory.attachment(create_batch_certificate_error_card()))
 
             await self.send_file_request(turn_context, zip_name, "Here are your results", "batchCSVResults")
