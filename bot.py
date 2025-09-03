@@ -90,7 +90,6 @@ def greetings():
         "\n" \
         "If you have any questions, please contact Hao.Ban@eHealthsask.ca"
 
-<<<<<<< HEAD
 def help_me():
     return "Sure! I can help. Below are the commands that I understand:\n" \
     "\n" \
