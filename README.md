@@ -6,8 +6,10 @@ So, I created this repository as a sort of documentation to explain how to set u
 
 ## How to set up the Microsoft Teams bot using Azure Bot Service
 ### NOTE: THIS GUIDE IS FOR SINGLE TENANT APPLICATIONS, I am not familiar with setting up a Bot using the User Assigned Managed Identity
-1. Pull this repository to get the structure of the bot. You can also refer to the <a href="https://github.com/microsoft/BotBuilder-Samples">Samples repository</a> to get a cleaner structure for the bot
-2. Run <code>pip install -r requirements.txt</code>
+1. Run <code>git clone https://github.com/n3vin2/MSTeamsBot.git</code> to get this repository.
+   1. Additionally, you can run <code>git clone https://github.com/n3vin2/MSTeamsBot.git --branch=clean_template</code> to get the clean template of the bot. This branch does not have any of the features of the Webex bot; it can only send a single response and handle certain files.
+   2. Pull this repository to get the structure of the bot. You can also refer to the <a href="https://github.com/microsoft/BotBuilder-Samples">Samples repository</a> to get a cleaner structure for the bot
+3. Run <code>pip install -r requirements.txt</code>
 
 ## System design for the Microsoft Teams bot
 (insert image here)
