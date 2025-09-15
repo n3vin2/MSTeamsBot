@@ -11,13 +11,13 @@ So, I created this repository as a sort of documentation to explain how to set u
 3. Now, just set <code>APP_TYPE = "SingleTenant"</code> since this guide is about creating a Single Tenant Azure bot. We will cover the remaining configurations later.
 4. **(OPTIONAL)** The ngrok tunnel is only opened upon starting the Python script as seen in **app.py**. You can remove all the ngrok lines and start the tunnel using a CLI. This guide does not cover ngrok however, so you can figure it out yourself.
 5. We can move onto the Azure part. Start off by creating an Azure Bot resource.
-    <img style="display: block;" src="Documentation_Pictures/AzureBotMarketplace.png" />
+    <img src="Documentation_Pictures/AzureBotMarketplace.png" />\
     Fill out the **Project Details** normally.
-    <img style="display: block" src="Documentation_Pictures/ProjectDetails.png" />
+    <img src="Documentation_Pictures/ProjectDetails.png" />\
     For the **Microsoft App ID**, select Single Tenant, and fill out the Single Tenant Application information.
-    <img style="display: block" src="Documentation_Pictures/MicrosoftAppID.png" />
+    <img src="Documentation_Pictures/MicrosoftAppID.png" />\
 6. Once you have created the bot, enter into the bot's configurations on Azure.
-    <img style="display: block" src="Documentation_Pictures/AzureConfigs.png" />
+    <img src="Documentation_Pictures/AzureConfigs.png" />\
     - The **Bot Type** and **Microsoft App ID** should already be filled and you should not be able to change it.
     - The messaging endpoint should be set to the URL of the machine that will be running the script. It should look something like this: <code>https://***{Endpoint}***/api/messages</code> where the ***Endpoint*** would be the domain/ip address used to reach the machine running the script.
         - To make this simple, all I did was sign up for an ngrok account, create a static domain, and I used the static domain as the messaging endpoint. The traffic will be tunneled to this device. This can be further shown under the System Design for the Microsoft Teams Bot
