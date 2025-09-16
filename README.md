@@ -13,19 +13,24 @@ So, I created this repository as a sort of documentation to explain how to set u
     Fill out the **Project Details** normally.
     <img src="Documentation_Pictures/ProjectDetails.png" />\
     For the **Microsoft App ID**, select Single Tenant, and fill out the Single Tenant Application information.
-    <img src="Documentation_Pictures/MicrosoftAppID.png" />\
+    <img src="Documentation_Pictures/MicrosoftAppID.png" />
 6. Once you have created the bot, enter into the bot's configurations on Azure.
-    <img src="Documentation_Pictures/AzureConfigs.png" />\
+    <img src="Documentation_Pictures/AzureConfigs.png" />
     - The **Bot Type** and **Microsoft App ID** should already be filled and you should not be able to change it.
     - The messaging endpoint should be set to the URL of the machine that will be running the script. It should look something like this: <code>https://***{Endpoint}***/api/messages</code> where the ***Endpoint*** would be the domain/ip address used to reach the machine running the script.
-        - To make this simple, all I did was sign up for an ngrok account, create a static domain, and I used the static domain as the messaging endpoint. The traffic will be tunneled to this device. This can be further shown under the [System Design for the Microsoft Teams Bot](#system-design-for-the-microsoft-teams-bot)
+        - To make this simple, all I did was sign up for an ngrok account, create a static domain, and I used the static domain as the messaging endpoint. The traffic will be tunneled to this device. This can be further shown under the [System Design for the Microsoft Teams Bot](#system-design-for-the-microsoft-teams-bot).
         - I added the path */api/messages* to the endpoint since this script will be listening for Teams message traffic through this path (this part is written in **app.py**)
     - I am not 100% sure about **App Tenant ID**, but I used my Organization's Entra Tenant ID (owner of the app) for the App Tenant ID.
 7. Now that the configurations for the Azure Bot have been set, you can now change the remaining parts of **config.py**. The values to be set (except for <code>PORT</code>) should all be strings.
     - Set the <code>APP_ID</code> to the **Microsoft App ID** in the **config.py**
     - Set the <code>APP_PASSWORD</code> to the password of the Single Tenant Application
     - Set the <code>APP_TENANTID</code> to the **APP Tenant ID** of the Azure Bot configuration
-8. Most of the configurations should be done at this point, and we should be able to move onto the bot deployment. All that you require to deploy the bot is to create a **manifest.zip** file. Open [this link](https://dev.teams.microsoft.com) and navigate to **Apps** on the left sidebar
+8. Most of the configurations should be done at this point, and we should be able to move onto the bot deployment. All that you require to deploy the bot is to create a **manifest.zip** file. Open [this link](https://dev.teams.microsoft.com) and navigate to **Apps** on the left .
+    <img src="Documentation_Pictures/TeamsDevHome.png" />
+    Select **New App**\
+    <img src="Documentation_Pictures/TeamsDevAppHome.png" />
+    Fill out the bot's name and just keep the version as **Latest Stable (v1.23)** (we will discuss this later)
+    <img src="Documentation_Pictures/NewAppFrag.png" />
 
 ## System Design for the Microsoft Teams Bot
 (insert image here)
