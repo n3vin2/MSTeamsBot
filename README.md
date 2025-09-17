@@ -25,12 +25,38 @@ So, I created this repository as a sort of documentation to explain how to set u
     - Set the <code>APP_ID</code> to the **Microsoft App ID** in the **config.py**
     - Set the <code>APP_PASSWORD</code> to the password of the Single Tenant Application
     - Set the <code>APP_TENANTID</code> to the **APP Tenant ID** of the Azure Bot configuration
-8. Most of the configurations should be done at this point, and we should be able to move onto the bot deployment. All that you require to deploy the bot is to create a **manifest.zip** file. Open [this link](https://dev.teams.microsoft.com) and navigate to **Apps** on the left .
-    <img src="Documentation_Pictures/TeamsDevHome.png" />
-    Select **New App**\
-    <img src="Documentation_Pictures/TeamsDevAppHome.png" />
+8. Most of the configurations should be done at this point, and we should be able to move onto the bot deployment. All that you require to deploy the bot is to create a **manifest.zip** file. We will first fill out the Basic information of **manifest.zip** .Open [this link](https://dev.teams.microsoft.com) and navigate to **Apps** on the left .
+    <img src="Documentation_Pictures/TeamsDevHome.png" />\
+    Select **New App**
+    <img src="Documentation_Pictures/TeamsDevAppHome.png" />\
     Fill out the bot's name and just keep the version as **Latest Stable (v1.23)** (we will discuss this later)
-    <img src="Documentation_Pictures/NewAppFrag.png" />
+    <img src="Documentation_Pictures/NewAppFrag.png" />\
+    Fill out the Basic information of the bot, the required fields should be marked with a red asterisk
+    <img src="Documentation_pictures/BotBasicInformation1.png" />\
+    Scroll to the bottom of Basic information until you see **Application (client) ID**. **You should fill this section with the Single Tenant Application's ID**; this would be the **Microsoft App ID** on the Azure Bot configuration as well as the <code>APP_ID</code> of config.py.\
+    <img src="Documentation_pictures/BotBasicInformation2.png" />
+9. After filling out the Basic information, you need to add the bot App onto the manifest. Navigate to **App features** and click the **Bot** feature.
+    <img src="Documentation_Pictures/AppFeatureHome.png" />\
+    For **Identify your bot**, I selected the second option (**Enter a bot ID**), and I used the Single Tenant Application's ID.
+    <img src="Documentation_Pictures/AppFeatureBotID.png" />\
+    Fill out the bot's permissions and scopes. For this bot, I only gave the bot the permission to "Upload and download files", and I made the bot available to everyone.
+    <img src="Documentation_Pictures/AppFeatureBotPerms.png" />\
+    Click **Save**, and the manifest file should be completed now.
+10. **(OPTIONAL)** You may also ignore the previous step and crete the manifest file shown in this step. I have uploaded a copy of the manifest file that worked for me so that you can just fill out the required IDs. The manifestVersion is older however (1.19), and there is an extra staticTabs feature in this file. Once you have filled out the required areas, you can copy the file contents and directly edit the manifest.json file. Go to **App package editor** and select **manifest.json**.
+    <img src="Documentation_Pictures/AppPackageEditorHome.png" />\
+    Now, you should see the contents of the json file. Just paste the contents of the "old" manifest file (the 1.19 version)
+    <img src="Documentation_Pictures/ManifestEditor.png" />\
+    <img src="Documentation_Pictures/ManifestEditorEdited.png" />\
+    Click **Save** on the top right corner. You should now be redirected to the main App package editor screen. Click **Update** on the top left corner.
+    <img src="Documentation_Pictures/AppPackageEditorHomeEdited.png" />\
+    Confirm the edits.
+    <img src="Documentation_Pictures/AppPackageEditorHomeConfirmation.png" />\
+    The manifest file should be completed now.
+11. Now that the manifest has been completed, you need to download and upload the zip file to Microsoft Teams. Navigate back to **Apps** on the left sidebar.
+    <img src="Documentation_Pictures/TeamsDevHomeNavigation.png" />\
+    Under your application, click the three dots and select **Download app package**
+    <img src="Documentation_Pictures/ManifestDownload.png" />
+    
 
 ## System Design for the Microsoft Teams Bot
 (insert image here)

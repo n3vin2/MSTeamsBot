@@ -1,0 +1,54 @@
+{
+    "$schema":"https://developer.microsoft.com/en-us/json-schemas/teams/v1.19/MicrosoftTeams.schema.json",
+    "version":"1.0.0",
+    "manifestVersion":"1.19",
+    "id":"{AUTO-GENERATED FROM CREATING AN APP ON https://dev.teams.microsoft.com}",
+    "name":{
+        "short":"New App",
+        "full":""
+    },
+    "developer":{
+        "name":"Developer",
+        "mpnId":"",
+        "websiteUrl":"https://google.com",
+        "privacyUrl":"https://google.com",
+        "termsOfUseUrl":"https://google.com"
+    },
+    "description":{
+        "short":"Short description",
+        "full":"Long description"
+    },
+    "icons":{
+        "outline":"outline.png",
+        "color":"color.png"
+    },
+    "accentColor":"#FFFFFF",
+    "staticTabs":[
+        {
+            "entityId":"conversations",
+            "scopes":["personal"]
+        },
+        {
+            "entityId":"about",
+            "scopes":["personal"]
+        }
+    ],
+    "bots":[
+        {
+            "botId":"{SINGLE TENANT APPLICATION ID}",
+            "scopes":[
+                "personal",
+                "team",
+                "groupChat"
+            ],
+            "isNotificationOnly":false,
+            "supportsCalling":false,
+            "supportsVideo":false,"supportsFiles":true
+        }
+    ],
+    "validDomains":[],
+    "webApplicationInfo":{
+        "id":"{SINGLE TENANT APPLICATION ID}",
+        "resource":""
+    }
+}

@@ -6,3 +6,5 @@
 !.gitignore
 !Documentation_Pictures
 !Documentation_Pictures/*
+!Manifest
+!Manifest/*
